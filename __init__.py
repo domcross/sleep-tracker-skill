@@ -81,6 +81,7 @@ class SleepTracker(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         dbconn = BufordSQLite(self.file_system.path)
+        LOG.debug(self.settings)
 
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
