@@ -81,11 +81,16 @@ class SleepTracker(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         dbconn = BufordSQLite(self.file_system.path)
+        birth_year = self.settings.get("year", "")
+        birth_month = self.settings.get("month", "")
+        birth_day = self.settings.get("day", "")
+        self.birthdate = datetime(year = birth_year, month = birth_month, day = birth_day)
         LOG.debug(self.settings)
 
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
-        self.speak_dialog('tracker.sleep')
+        #self.speak_dialog('tracker.sleep')
+        self.speak("Year: " + self.birthdate.year)
 
 
 def create_skill():
