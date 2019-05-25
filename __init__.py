@@ -85,7 +85,7 @@ class SleepTracker(MycroftSkill):
         birth_month = self.settings.get("month", "")
         birth_day = self.settings.get("day", "")
         self.birthdate = datetime(year = birth_year, month = birth_month, day = birth_day)
-        LOG.debug(self.settings)
+        #LOG.debug(self.settings)
 
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
