@@ -1,6 +1,6 @@
 import sqlite3
 import datetime
-from datetime import date
+from datetime import datetime, date
 from datetime import time
 from mycroft import MycroftSkill, intent_file_handler
 
