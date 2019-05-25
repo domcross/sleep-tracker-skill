@@ -4,17 +4,17 @@ skillMetadata:
     - name: Birth Date
       fields:
         - name: year
-          type: Number
+          type: number
           label: Year
           value: ""
           placeholder: 1993
           name: month
-          type: Number
+          type: number
           label: Month
           value: ""
           placeholder: 12
           name: day
-          type: Number
+          type: number
           label: Day
           value: ""
           placeholder: 16
