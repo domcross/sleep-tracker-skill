@@ -90,7 +90,7 @@ class SleepTracker(MycroftSkill):
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
         #self.speak_dialog('tracker.sleep')
-        self.speak("Year: " + self.birthdate.year)
+        self.speak("Year: " + str(self.birthdate.year))
 
 
 def create_skill():
