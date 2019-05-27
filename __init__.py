@@ -11,7 +11,7 @@ class BufordSQLite:
     def __init__(self, path=""):
         # Use any name that you want here
         # TODO - this saves to the mycroft-core directory by default
-        self.conn = sqlite3.connect(path + '/buford.db')
+        self.conn = sqlite3.connect(path + '/buford.db', check_same_thread=False)
 
     # Query that returns nothing (e.g. INSERT)
     def emptyQuery(self, query):
