@@ -135,7 +135,7 @@ class SleepTracker(MycroftSkill):
         # Wakeup time is now -- it is when the user tells Mycroft that they are awake
         wakeup_time = datetime.now()
         # Gets the number of hours slept
-        differences = current_time - sleep_time
+        differences = wakeup_time - sleep_time
         differences_days = differences.days
         # Gets the most recent open sleep record, and adds the sleep_end time to mark the record as closed.
         if differences_days < 1:
