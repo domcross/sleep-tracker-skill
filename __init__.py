@@ -118,13 +118,50 @@ class SleepTracker(MycroftSkill):
                 self.dbconn.emptyQuery(updateInvalidateQuery)
                 self.dbconn.commit()
 
+    # DATABASE - Closes the sleep record.
+    # This ensures that the number of hours can be obtained
+    # Calculations are performed database-wide instead of manually recording the number of hours
+    # TODO - Return error if there are no open sleep records
+    def closeSleepRecord():
+        # Checks for an open, non-invalidated record
+        unclosedRecordsQuery = "SELECT record_id, sleep_start FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
+        record_to_be_closed = self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Columns")
+        # Gets sleep time
+        sleep_time = bufordSQLiteString_to_datetime(record_to_be_closed[1]) 
+        # Wakeup time is now -- it is when the user tells Mycroft that they are awake
+        wakeup_time = datetime.now()
+        # Gets the number of hours slept
+        differences = current_time - sleep_time
+        differences_days = differences.days
+        # Gets the most recent open sleep record, and adds the sleep_end time to mark the record as closed.
+        if differences_days < 1:
+            updateInvalidateQuery = "UPDATE sleep_records SET sleep_end = '" + datetime_to_BufordSQLiteString(wakeup_time) + "' WHERE record_id = " + str(record_to_be_closed[0])
+            self.dbconn.emptyQuery(updateInvalidateQuery)
+            self.dbconn.commit()
+            differences_str = str(differences)
+            differences_list = differences_str.split(':')
+            # Returns the number of hours in string format, to avoid string conversions on the Mycroft response.
+            return differences_list[0]
+
     # MYCROFT - allows user to start the sleep tracker.
     # This calls the openSleepRecord method.
+    # TODO - error if a record is still unopen and is below 24 hours.
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
-        #self.speak_dialog('tracker.sleep')
-        self.speak("Month: " + str(self.birthdate.month))
+        # Invalidating sleep records beyond 24 hours
+        self.invalidateBeyond24Hours()
+        # Creates a new sleep record
+        self.openSleepRecord()
+        # Reminds user that the sleep tracker is started
+        self.speak_dialog('tracker.sleep')
 
+    # MYCROFT - allows user to stop the sleep tracker.
+    # This calls the closeSleepRecord method.
+    # TODO - error if there are no open sleep records.
+    @intent_file_handler('tracker.wakeup.intent')
+    def handle_tracker_wakeup(self, message):
+        num_hours = self.closeSleepRecord()
+        self.speak("You have slept for " + num_hours + "hours.")
 
 def create_skill():
     return SleepTracker()

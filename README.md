@@ -9,6 +9,10 @@ Tracks sleep patterns by using the number of hours depending on age, as indicate
 * "Monitor my sleep"
 * "I'm about to go to sleep"
 * "Start the sleep tracker"
+* "How long am I asleep"
+* "Stop the tracker"
+* "I am awake"
+* "I am up"
 
 ## Credits
 rekkitcwts
