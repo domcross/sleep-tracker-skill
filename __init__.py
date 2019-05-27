@@ -92,6 +92,10 @@ class SleepTracker(MycroftSkill):
         self.dbconn.commit()
         #LOG.debug(self.settings)
 
+    def initialize(self):
+        self.register_intent_file('tracker.sleep.intent', self.handle_tracker_sleep)
+        self.register_intent_file('tracker.wakeup.intent', self.handle_tracker_wakeup)
+
     # DATABASE - creates a new sleep record
     def openSleepRecord():
         openRecordQuery = "INSERT INTO sleep_records (sleep_start) VALUES ('" + datetime_to_BufordSQLiteString(datetime.now()) + "')"
