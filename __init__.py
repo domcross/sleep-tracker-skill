@@ -97,19 +97,19 @@ class SleepTracker(MycroftSkill):
         self.register_intent_file('tracker.wakeup.intent', self.handle_tracker_wakeup)
 
     # DATABASE - creates a new sleep record
-    def openSleepRecord():
+    def openSleepRecord(self):
         openRecordQuery = "INSERT INTO sleep_records (sleep_start) VALUES ('" + datetime_to_BufordSQLiteString(datetime.now()) + "')"
         self.dbconn.emptyQuery(openRecordQuery)
         self.dbconn.commit()
 
     # DATABASE - checks for a previously open sleep record. Can be used when attempting to create a record via voice
-    def checkUnclosedSleepRecord():
+    def checkUnclosedSleepRecord(self):
         unclosedRecordsQuery = "SELECT record_id FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
         return self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Table")
 
     # DATABASE - Automatically invalidates any sleep records that were forgot to close after 24 hours.
     # Sleep records should be closed the moment the user wakes up.
-    def invalidateBeyond24Hours():
+    def invalidateBeyond24Hours(self):
         unclosedRecordsQuery = "SELECT record_id, sleep_start FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
         current_time = datetime.now()
         openRecords = self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Table")
@@ -126,7 +126,7 @@ class SleepTracker(MycroftSkill):
     # This ensures that the number of hours can be obtained
     # Calculations are performed database-wide instead of manually recording the number of hours
     # TODO - Return error if there are no open sleep records
-    def closeSleepRecord():
+    def closeSleepRecord(self):
         # Checks for an open, non-invalidated record
         unclosedRecordsQuery = "SELECT record_id, sleep_start FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
         record_to_be_closed = self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Columns")
