@@ -92,9 +92,9 @@ class SleepTracker(MycroftSkill):
         self.dbconn.commit()
         #LOG.debug(self.settings)
 
-    def initialize(self):
-        self.register_intent_file('tracker.sleep.intent', self.handle_tracker_sleep)
-        self.register_intent_file('tracker.wakeup.intent', self.handle_tracker_wakeup)
+    #def initialize(self):
+    #    self.register_intent_file('tracker.sleep.intent', self.handle_tracker_sleep)
+    #    self.register_intent_file('tracker.wakeup.intent', self.handle_tracker_wakeup)
 
     # DATABASE - creates a new sleep record
     def openSleepRecord(self):
