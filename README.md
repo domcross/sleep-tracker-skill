@@ -1,4 +1,4 @@
-# <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/robot.svg" card_color="#40DBB0" width="50" height="50" style="vertical-align:bottom"/> Sleep Tracker
+# <img src='https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/bed.svg' card_color='#22a7f0' width='50' height='50' style='vertical-align:bottom'/> Sleep Tracker
 Tracks sleep patterns by using the number of hours
 
 ## About

@@ -35,6 +35,7 @@ class BufordSQLite:
         self.conn.close()
         
 # manually converts a Datetime to a string with format YYYY-MM-DD HH:MM:SS for SQLite purposes
+# TODO - return error if object is not a datetime object
 def datetime_to_BufordSQLiteString(datetime_object):
     sql_friendly_string = str(datetime_object.year) + "-"
     if datetime_object.month >= 10:
@@ -79,14 +80,46 @@ def bufordSQLiteString_to_datetime(bufordSQLiteString):
 
 class SleepTracker(MycroftSkill):
     def __init__(self):
+        # Initialize, including birthdate from skill settings and the database table
         MycroftSkill.__init__(self)
-        dbconn = BufordSQLite(self.file_system.path)
+        self.dbconn = BufordSQLite(self.file_system.path)
         birth_year = self.settings.get("year", "")
         birth_month = self.settings.get("month", "")
         birth_day = self.settings.get("day", "")
         self.birthdate = datetime(year = birth_year, month = birth_month, day = birth_day)
+        table_query = "CREATE TABLE IF NOT EXISTS sleep_records (record_id INTEGER NOT NULL PRIMARY KEY, sleep_start TEXT NOT NULL, sleep_end TEXT, invalidated INTEGER NOT NULL DEFAULT 0)"
+        self.dbconn.emptyQuery(table_query)
+        self.dbconn.commit()
         #LOG.debug(self.settings)
 
+    # DATABASE - creates a new sleep record
+    def openSleepRecord():
+        openRecordQuery = "INSERT INTO sleep_records (sleep_start) VALUES ('" + datetime_to_BufordSQLiteString(datetime.now()) + "')"
+        self.dbconn.emptyQuery(openRecordQuery)
+        self.dbconn.commit()
+
+    # DATABASE - checks for a previously open sleep record. Can be used when attempting to create a record via voice
+    def checkUnclosedSleepRecord():
+        unclosedRecordsQuery = "SELECT record_id FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
+        return self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Table")
+
+    # DATABASE - Automatically invalidates any sleep records that were forgot to close after 24 hours.
+    # Sleep records should be closed the moment the user wakes up.
+    def invalidateBeyond24Hours():
+        unclosedRecordsQuery = "SELECT record_id, sleep_start FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
+        current_time = datetime.now()
+        openRecords = self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Table")
+        for record in openRecords:
+            sleep_time = bufordSQLiteString_to_datetime(record[1])
+            differences = current_time - sleep_time
+            differences_days = differences.days
+            if differences_days >= 1:
+                updateInvalidateQuery = "UPDATE sleep_records SET invalidated = 1 WHERE record_id = " + str(record[0]) + ""
+                self.dbconn.emptyQuery(updateInvalidateQuery)
+                self.dbconn.commit()
+
+    # MYCROFT - allows user to start the sleep tracker.
+    # This calls the openSleepRecord method.
     @intent_file_handler('tracker.sleep.intent')
     def handle_tracker_sleep(self, message):
         #self.speak_dialog('tracker.sleep')
