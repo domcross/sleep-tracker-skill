@@ -3,6 +3,7 @@ import datetime
 from datetime import datetime, date
 from datetime import time
 from mycroft import MycroftSkill, intent_file_handler
+import math
 
 # The class BufordSQLite that handles the sqlite database in an OOP manner
 # Named to avoid confusion with the built-in SQLite libraries
