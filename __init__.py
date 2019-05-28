@@ -77,6 +77,32 @@ def bufordSQLiteString_to_datetime(bufordSQLiteString):
     final_datetime = datetime(year = int(list_date[0]), month = int(list_date[1]), day = int(list_date[2]), hour = int(list_time[0]), minute = int(list_time[1]), second = int(list_time[2]))
     return final_datetime
 
+# Allows Jarvis to perform an evaluation based on age and number of hours
+# Based on https://www.sleepfoundation.org/press-release/national-sleep-foundation-recommends-new-sleep-times
+def getSleepResults(age, num_hours):
+    if age <= 2: # Toddlers
+        if num_hours >= 11 and num_hours <= 14:
+            result = "good"
+        if (num_hours >= 9 and num_hours <= 10) or (num_hours >= 15 and num_hours <= 16):
+            result = "ok"
+        if num_hours < 9 or num_hours > 16:
+            result = "bad"
+    if age > 2 and age <= 5: # Pre-schoolers
+        if num_hours >= 10 and num_hours <= 13:
+            result = "good"
+        if (num_hours >= 8 and num_hours <= 9) or (num_hours > 13 and num_hours <= 14):
+            result = "ok"
+        if num_hours < 8 or num_hours > 14:
+            result = "bad"
+    if age >= 18 and age <= 25: # young adults
+        if num_hours >= 7 and num_hours <= 9:
+            result = "good"
+        if (num_hours == 6) or (num_hours >= 10 and num_hours <= 11):
+            result = "ok"
+        if num_hours < 6 or num_hours > 11:
+            result = "bad"
+
+    return result
 
 class SleepTracker(MycroftSkill):
     def __init__(self):
@@ -165,7 +191,10 @@ class SleepTracker(MycroftSkill):
     @intent_file_handler('tracker.wakeup.intent')
     def handle_tracker_wakeup(self, message):
         num_hours = self.closeSleepRecord()
-        self.speak("You have slept for " + num_hours + "hours.")
+        self.speak("You have slept for " + num_hours + " hours.")
+        ageDelta = datetime.now() - self.birthdate
+        age = math.floor(ageDelta.days / 365)
+        self.speak(age, int(num_hours))
 
 def create_skill():
     return SleepTracker()
