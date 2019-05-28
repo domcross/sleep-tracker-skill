@@ -78,7 +78,7 @@ def bufordSQLiteString_to_datetime(bufordSQLiteString):
     final_datetime = datetime(year = int(list_date[0]), month = int(list_date[1]), day = int(list_date[2]), hour = int(list_time[0]), minute = int(list_time[1]), second = int(list_time[2]))
     return final_datetime
 
-# Allows Jarvis to perform an evaluation based on age and number of hours
+# Allows Mycroft to perform an evaluation based on age and number of hours
 # Based on https://www.sleepfoundation.org/press-release/national-sleep-foundation-recommends-new-sleep-times
 def getSleepResults(age, num_hours):
     if age <= 2: # Toddlers
@@ -95,12 +95,40 @@ def getSleepResults(age, num_hours):
             result = "ok"
         if num_hours < 8 or num_hours > 14:
             result = "bad"
+    if age > 5 and age <= 13: # School-aged Children
+        if num_hours >= 9 and num_hours <= 11:
+            result = "good"
+        if (num_hours >= 7 and num_hours <= 8) or (num_hours == 12):
+            result = "ok"
+        if num_hours < 7 or num_hours > 12:
+            result = "bad"
+    if age > 13 and age <= 17: # Teenagers
+        if num_hours >= 8 and num_hours <= 10:
+            result = "good"
+        if (num_hours == 7) or (num_hours == 11):
+            result = "ok"
+        if num_hours < 7 or num_hours > 11:
+            result = "bad"
     if age >= 18 and age <= 25: # young adults
         if num_hours >= 7 and num_hours <= 9:
             result = "good"
         if (num_hours == 6) or (num_hours >= 10 and num_hours <= 11):
             result = "ok"
         if num_hours < 6 or num_hours > 11:
+            result = "bad"
+    if age >= 26 and age <= 64: # young adults
+        if num_hours >= 7 and num_hours <= 9:
+            result = "good"
+        if (num_hours == 6) or (num_hours == 10):
+            result = "ok"
+        if num_hours < 6 or num_hours > 10:
+            result = "bad"
+    if age >= 65: # the elderly
+        if num_hours >= 7 and num_hours <= 8:
+            result = "good"
+        if (num_hours >= 5 and num_hours <= 6) or (num_hours == 9):
+            result = "ok"
+        if num_hours < 5 or num_hours > 9:
             result = "bad"
 
     return result
@@ -117,11 +145,6 @@ class SleepTracker(MycroftSkill):
         table_query = "CREATE TABLE IF NOT EXISTS sleep_records (record_id INTEGER NOT NULL PRIMARY KEY, sleep_start TEXT NOT NULL, sleep_end TEXT, invalidated INTEGER NOT NULL DEFAULT 0)"
         self.dbconn.emptyQuery(table_query)
         self.dbconn.commit()
-        #LOG.debug(self.settings)
-
-    #def initialize(self):
-    #    self.register_intent_file('tracker.sleep.intent', self.handle_tracker_sleep)
-    #    self.register_intent_file('tracker.wakeup.intent', self.handle_tracker_wakeup)
 
     # DATABASE - creates a new sleep record
     def openSleepRecord(self):
@@ -196,7 +219,12 @@ class SleepTracker(MycroftSkill):
         ageDelta = datetime.now() - self.birthdate
         age = math.floor(ageDelta.days / 365)
         results = getSleepResults(age, int(num_hours))
-        self.speak(results)
+        if results == "good":
+            self.speak_dialog('results.good')
+        if results == "ok":
+            self.speak_dialog('results.ok')
+        if results == "bad":
+            self.speak_dialog('results.bad')
 
 def create_skill():
     return SleepTracker()
