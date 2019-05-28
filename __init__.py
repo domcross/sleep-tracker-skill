@@ -195,7 +195,8 @@ class SleepTracker(MycroftSkill):
         self.speak("You have slept for " + num_hours + " hours.")
         ageDelta = datetime.now() - self.birthdate
         age = math.floor(ageDelta.days / 365)
-        self.speak(age, int(num_hours))
+        results = getSleepResults(age, int(num_hours))
+        self.speak(results)
 
 def create_skill():
     return SleepTracker()
