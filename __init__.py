@@ -138,9 +138,9 @@ class SleepTracker(MycroftSkill):
         # Initialize, including birthdate from skill settings and the database table
         MycroftSkill.__init__(self)
         self.dbconn = BufordSQLite(self.file_system.path)
-        birth_year = self.settings.get("year", "")
-        birth_month = self.settings.get("month", "")
-        birth_day = self.settings.get("day", "")
+        birth_year = self.settings.get("year", "1970")
+        birth_month = self.settings.get("month", "1")
+        birth_day = self.settings.get("day", "1")
         self.birthdate = datetime(year = int(birth_year), month = int(birth_month), day = int(birth_day))
         table_query = "CREATE TABLE IF NOT EXISTS sleep_records (record_id INTEGER NOT NULL PRIMARY KEY, sleep_start TEXT NOT NULL, sleep_end TEXT, invalidated INTEGER NOT NULL DEFAULT 0)"
         self.dbconn.emptyQuery(table_query)
