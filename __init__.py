@@ -34,7 +34,7 @@ class BufordSQLite:
     # Closes Database Connection
     def close(self):
         self.conn.close()
-        
+
 # manually converts a Datetime to a string with format YYYY-MM-DD HH:MM:SS for SQLite purposes
 # TODO - return error if object is not a datetime object
 def datetime_to_BufordSQLiteString(datetime_object):
@@ -146,6 +146,18 @@ class SleepTracker(MycroftSkill):
         self.dbconn.emptyQuery(table_query)
         self.dbconn.commit()
 
+    def initialize(self):
+        self.settings.set_changed_callback(self.on_websettings_changed)
+        self.on_websettings_changed()
+
+    def on_websettings_changed(self):
+        if self.settings.get("attach_to_naptime", False):
+            self.add_event('recognizer_loop:sleep', self.handle_tracker_sleep)
+            self.add_event('mycroft.awoken', self.handle_tracker_wakeup)
+        else:
+            self.remove_event('recognizer_loop:sleep')
+            self.remove_event('mycroft.awoken')
+
     # DATABASE - creates a new sleep record
     def openSleepRecord(self):
         openRecordQuery = "INSERT INTO sleep_records (sleep_start) VALUES ('" + datetime_to_BufordSQLiteString(datetime.now()) + "')"
@@ -181,7 +193,7 @@ class SleepTracker(MycroftSkill):
         unclosedRecordsQuery = "SELECT record_id, sleep_start FROM sleep_records WHERE sleep_end IS NULL AND invalidated = 0"
         record_to_be_closed = self.dbconn.returnQuery(unclosedRecordsQuery, return_type="Columns")
         # Gets sleep time
-        sleep_time = bufordSQLiteString_to_datetime(record_to_be_closed[1]) 
+        sleep_time = bufordSQLiteString_to_datetime(record_to_be_closed[1])
         # Wakeup time is now -- it is when the user tells Mycroft that they are awake
         wakeup_time = datetime.now()
         # Gets the number of hours slept

@@ -18,3 +18,7 @@ skillMetadata:
           label: Day
           value: ""
           placeholder: 16
+        - name: attach_to_naptime
+          type: checkbox
+          label: Attach to Naptime skill
+          value: "false"
